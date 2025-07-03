@@ -1,0 +1,31 @@
+
+networks:
+  ollama-network:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: "${OLLAMA_NETWORK}"
+
+services:
+
+  ollama:
+    image:          local-ollama
+    container_name: local-ollama
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    networks: [ "ollama-network" ]
+    ports:
+      - "11434:11434"
+      - "8080:8080"
+    volumes:
+      - ./data/webui:/usr/local/lib/python3.12/site-packages/open_webui/data
+      - ./data/ollama-ssh:/root/.ollama
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
