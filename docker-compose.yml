@@ -1,27 +1,22 @@
 
-networks:
-  ollama-network:
-    driver: bridge
-    ipam:
-      driver: default
-      config:
-        - subnet: "${OLLAMA_NETWORK}"
-
 services:
 
-  ollama:
-    image:          local-ollama
-    container_name: local-ollama
+  self-llm:
     build: 
       context: .
       dockerfile: Dockerfile
-    networks: [ "ollama-network" ]
+    image: self-llm
+    container_name: self-llm
+    runtime: nvidia
     ports:
-      - "11434:11434"
-      - "8080:8080"
+      - "11434:11434" # ollama api
+      - "80:8080"     # webui
+    environment:
+      WEBUI_SECRET_KEY: "google: read-about-webui-key"
     volumes:
-      - ./data/webui:/usr/local/lib/python3.12/site-packages/open_webui/data
-      - ./data/ollama-ssh:/root/.ollama
+      - .data/models:/srv/models                                           # The models
+      - .data/ollama:/root/.ollama                                         # Some generated keys
+      - .data/data:/usr/local/lib/python3.12/site-packages/open_webui/data # WebUI data folder
     deploy:
       resources:
         reservations:
