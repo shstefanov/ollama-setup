@@ -27,5 +27,4 @@ ENV OLLAMA_NOPRUNE 1
 # from https://github.com/open-webui/open-webui
 RUN pip install open-webui
 
-
 CMD ollama serve& open-webui serve
